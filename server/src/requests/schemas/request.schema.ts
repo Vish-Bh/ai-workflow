@@ -1,15 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+
+export type RequestDocument = Request & Document;
 
 @Schema({ timestamps: true })
 export class Request {
   @Prop({ required: true })
-  name: string;
-
-  @Prop({ required: true })
-  email: string;
-
-  @Prop({ required: true })
-  message: string;
+  userId: string;
 
   @Prop({
     enum: ['billing', 'support', 'feedback', 'general'],

@@ -5,33 +5,52 @@ import { Request } from './schemas/request.schema';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { AiService } from '../ai/ai.service';
 
+import { Document } from 'mongoose';
+
+export type RequestDocument = Request & Document;
+
 @Injectable()
 export class RequestsService {
   constructor(
-    @InjectModel(Request.name) private requestModel: Model<Request>,
+    @InjectModel(Request.name)
+    private requestModel: Model<RequestDocument>,
     private aiService: AiService,
   ) {}
 
-  async create(dto: CreateRequestDto) {
-    const request = await this.requestModel.create(dto);
+  async create(userId: string, dto: CreateRequestDto) {
+  const request = await this.requestModel.create({
+    userId,
+    category: dto.category,
+    summary: dto.summary,
+    urgency: dto.urgency,
+  });
 
-    // 🔥 async AI processing (DO NOT WAIT)
-    setImmediate(() => {
-      this.aiService.enrichRequest(request._id.toString());
-    });
+  setImmediate(async () => {
+    try {
+      await this.aiService.enrichRequest(request._id.toString());
+    } catch (err) {
+      console.error('AI enrichment failed:', err);
+    }
+  });
 
-    return request;
-  }
+  return request;
+}
 
   async findAll(page = 1, limit = 10, category?: string) {
-    const query = category ? { category } : {};
+    page = Math.max(1, page);
+    limit = Math.min(Math.max(1, limit), 50);
 
-    const data = await this.requestModel
+    const allowedCategories = ['billing', 'support', 'feedback', 'general'];
+
+    const query =
+      category && allowedCategories.includes(category)
+        ? { category }
+        : {};
+
+    return this.requestModel
       .find(query)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ createdAt: -1 });
-
-    return data;
   }
 }

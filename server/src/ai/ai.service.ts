@@ -35,9 +35,10 @@ Return ONLY valid JSON:
             },
             {
               role: 'user',
-              content: `Name: ${request.name}
-Email: ${request.email}
-Message: ${request.message}`
+              content: `UserId: ${request.userId}
+Category: ${request.category}
+Summary: ${request.summary}
+Urgency: ${request.urgency}`
             }
           ]
         },

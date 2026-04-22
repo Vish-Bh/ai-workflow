@@ -1,14 +1,18 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreateRequestDto {
   @IsString()
-  @IsNotEmpty()
-  name: string;
+  userId: string;
 
-  @IsEmail()
-  email: string;
+  @IsOptional()
+  @IsEnum(['billing', 'support', 'feedback', 'general'])
+  category?: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  message: string;
+  summary?: string;
+
+  @IsOptional()
+  @IsEnum(['low', 'medium', 'high'])
+  urgency?: string;
 }
