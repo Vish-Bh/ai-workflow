@@ -14,15 +14,22 @@ debug(@Req() req) {
   return req.user;
 }
 @Get('my-requests')
-@Get('my-requests')
 getMyRequests(
   @Req() req,
-  @Query('page', new ParseIntPipe({ optional: true })) page = 1,
-  @Query('limit', new ParseIntPipe({ optional: true })) limit = 10,
+  @Query('page') page = '1',
+  @Query('limit') limit = '10',
+  @Query('urgency') urgency?: string,
+  @Query('category') category?: string,
 ) {
   const userId = req.user.userId || req.user.sub;
 
-  return this.requestsService.getMyRequests(userId, page, limit);
+  return this.requestsService.getMyRequests(
+    userId,
+    Number(page),
+    Number(limit),
+    urgency,
+    category,
+  );
 }
 
 @Post()

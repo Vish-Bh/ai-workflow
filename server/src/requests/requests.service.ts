@@ -55,14 +55,24 @@ async createRequest(userId: string, dto: CreateRequestDto) {
       .sort({ createdAt: -1 });
   }
 
-  async getMyRequests(userId: string, page = 1, limit = 10) {
-  page = Math.max(1, page);
-  limit = Math.min(Math.max(1, limit), 50);
+  async getMyRequests(
+  userId: string,
+  page = 1,
+  limit = 10,
+  urgency?: string,
+  category?: string,
+) {
+  const skip = (page - 1) * limit;
+
+  const filter: any = { userId };
+
+  if (urgency) filter.urgency = urgency;
+  if (category) filter.category = category;
 
   return this.requestModel
-    .find({ userId })
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .sort({ createdAt: -1 });
+    .find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
 }
 }
