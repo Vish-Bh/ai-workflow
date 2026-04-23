@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 import { ErrorBanner } from "@/components/ui/error-banner"
 
 export default function LoginPage() {
+  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
   const router = useRouter()
   const [error, setError] = useState("")
 
