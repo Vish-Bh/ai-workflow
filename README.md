@@ -1,98 +1,291 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🤖 AI Workflow — Full Stack Request Management App
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+An AI-powered full stack web application that lets users submit requests, automatically enriched with urgency categorization via an integrated AI service. Built with Next.js 19 on the frontend and a secure JWT-authenticated REST API backend.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 📋 Table of Contents
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [API Reference](#-api-reference)
+- [Frontend Pages](#-frontend-pages)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [Authentication](#-authentication)
 
-## Project setup
+---
 
-```bash
-$ npm install
+## ✨ Features
+
+- 🔐 Secure authentication with JWT (login & signup)
+- 🤖 AI-powered request enrichment — auto-assigns urgency categories to user messages
+- 📋 Full request lifecycle management — create, view, and filter requests
+- 👤 User profile management
+- 🎨 Modern UI built with Radix UI, Tailwind CSS, and shadcn/ui components
+- 📊 Data visualizations via Recharts
+- 🌙 Theme support (light/dark mode via next-themes)
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+| Technology | Purpose |
+|---|---|
+| [Next.js 16](https://nextjs.org/) | React framework (App Router) |
+| [React 19](https://react.dev/) | UI library |
+| [TypeScript 5.7](https://www.typescriptlang.org/) | Type safety |
+| [Tailwind CSS v4](https://tailwindcss.com/) | Utility-first styling |
+| [Radix UI](https://www.radix-ui.com/) | Accessible component primitives |
+| [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) | Form handling & validation |
+| [Recharts](https://recharts.org/) | Data visualization |
+| [Lucide React](https://lucide.dev/) | Icon library |
+| [Sonner](https://sonner.emilkowal.ski/) | Toast notifications |
+| [next-themes](https://github.com/pacocoursey/next-themes) | Dark/light mode |
+
+### Backend
+| Technology | Purpose |
+|---|---|
+| JWT | Secure authentication & persistent login |
+| AI Service | Request enrichment & urgency categorization |
+| REST API | Backend routes for auth, users, and requests |
+
+---
+
+## 📁 Project Structure
+
+```
+├── frontend/                  # Next.js application
+│   ├── app/
+│   │   ├── page.tsx           # Landing page (/)
+│   │   ├── login/             # Login page (/login)
+│   │   ├── signup/            # Signup page (/signup)
+│   │   └── dashboard/
+│   │       ├── page.tsx       # Dashboard home (/dashboard)
+│   │       ├── profile/       # User profile (/dashboard/profile)
+│   │       ├── requests/      # All requests with filters (/dashboard/requests)
+│   │       └── new-request/   # Create new request (/dashboard/new-request)
+│   ├── components/            # Reusable UI components
+│   └── package.json
+│
+└── backend/                   # REST API server
+    ├── routes/
+    │   ├── auth/              # Authentication routes
+    │   ├── requests/          # Request management routes
+    │   └── users/             # User profile routes
+    └── services/
+        └── ai/                # AI enrichment service
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## 📡 API Reference
 
-# watch mode
-$ npm run start:dev
+### Authentication
 
-# production mode
-$ npm run start:prod
+#### `POST /auth/signup`
+Register a new user account.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
 ```
 
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+**Response:**
+```json
+{
+  "token": "<jwt_token>",
+  "user": { "id": "...", "email": "..." }
+}
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+#### `POST /auth/login`
+Authenticate an existing user.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+**Response:**
+```json
+{
+  "token": "<jwt_token>",
+  "user": { "id": "...", "email": "..." }
+}
+```
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+### Requests
+> 🔒 All `/requests` routes are **JWT-protected**. Include the token in the `Authorization` header:
+> `Authorization: Bearer <token>`
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+#### `GET /requests/my-requests`
+Retrieve all requests belonging to the currently authenticated user.
 
-## Support
+**Response:**
+```json
+[
+  {
+    "id": "...",
+    "message": "...",
+    "urgencyCategory": "HIGH",
+    "createdAt": "..."
+  }
+]
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+#### `POST /requests/createRequest`
+Create a new request. The message is automatically enriched by the AI service, which assigns an urgency category.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**Request Body:**
+```json
+{
+  "message": "I need help with my order urgently"
+}
+```
 
-## License
+**Response:**
+```json
+{
+  "id": "...",
+  "message": "I need help with my order urgently",
+  "urgencyCategory": "HIGH",
+  "createdAt": "..."
+}
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
+
+### Users
+> 🔒 Protected route — requires a valid JWT token.
+
+#### `GET /users/profile`
+Retrieve the profile information of the currently authenticated user.
+
+**Response:**
+```json
+{
+  "id": "...",
+  "email": "user@example.com",
+  "createdAt": "..."
+}
+```
+
+> ℹ️ Additional internal user services exist but are not exposed through the user controller.
+
+---
+
+### AI Service
+
+The AI service powers the `enrichRequest` function, which is automatically called on every new request submission. It analyzes the user's message and assigns one of the following urgency categories:
+
+| Category | Description |
+|---|---|
+| `LOW` | Non-time-sensitive requests |
+| `MEDIUM` | Standard requests needing attention |
+| `HIGH` | Urgent requests requiring prompt action |
+| `CRITICAL` | Immediate attention required |
+
+---
+
+## 🖥 Frontend Pages
+
+| Route | Description |
+|---|---|
+| `/` | Landing page — app introduction & entry point |
+| `/login` | Login form for returning users |
+| `/signup` | Registration form for new users |
+| `/dashboard` | Main dashboard — central hub of the app |
+| `/dashboard/profile` | View and manage user profile information |
+| `/dashboard/requests` | View all requests with filtering options |
+| `/dashboard/new-request` | Form to create a new AI-enriched request |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js `>= 18`
+- npm or yarn
+- Backend server running and accessible
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+
+# Install frontend dependencies
+cd frontend
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The app will be available at `http://localhost:3000`.
+
+### Build for Production
+
+```bash
+npm run build
+npm run start
+```
+
+---
+
+## 🔑 Environment Variables
+
+Create a `.env.local` file in the `frontend/` directory:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:your-backend-port
+```
+
+Create a `.env` file in the `backend/` directory:
+
+```env
+JWT_SECRET=your_jwt_secret_key
+AI_SERVICE_API_KEY=your_ai_service_key
+PORT=5000
+DATABASE_URL=your_database_connection_string
+```
+
+> ⚠️ Never commit `.env` files to version control. Add them to `.gitignore`.
+
+---
+
+## 🔐 Authentication
+
+This app uses **JSON Web Tokens (JWT)** for secure, stateless authentication.
+
+- On login or signup, the server returns a signed JWT.
+- The token is stored client-side and sent with every protected API request via the `Authorization: Bearer <token>` header.
+- Token validation is handled server-side on all protected routes (`/requests/*`, `/users/profile`).
+- Persistent login is maintained as long as the token remains valid.
+
+---
+
+## 📄 License
+
+This project is private and not licensed for public distribution.
+
+---
+
+> Built with ❤️ using Next.js, Radix UI, and AI-powered request enrichment.
