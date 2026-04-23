@@ -8,7 +8,6 @@ export class AuthController {
 
   @Post('signup')
 signup(@Body() body: { name: string; email: string; password: string }) {
-  console.log(body)
   return this.authService.signup(body.name, body.email, body.password);
 }
 

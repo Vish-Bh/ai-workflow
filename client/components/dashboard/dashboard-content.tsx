@@ -1,11 +1,13 @@
 "use client";
- 
+
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { NewRequestButton } from "../new-request-button";
 import { getMyRequests } from "@/lib/api";
 import { RecentRequestsList } from "./recent-requests-list";
 import { LatestRequestCard } from "./latest-request-card";
 import { RequestDetailModal } from "./request-detail-modal";
+
 export interface Request {
   _id: string;
   userId: string;
@@ -18,32 +20,50 @@ export interface Request {
   updatedAt: string;
   __v?: number;
 }
+
 export function DashboardContent() {
+  const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<Request[]>([]);
   const [username, setUsername] = useState("User");
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
- 
+
   useEffect(() => {
     async function load() {
       try {
         const token = localStorage.getItem("token");
+
+        // 🚨 IMPORTANT: no token = go login
         if (!token) {
-          setLoading(false);
+          router.replace("/login");
           return;
         }
- 
+
         const storedName = localStorage.getItem("username");
         if (storedName) setUsername(storedName);
- 
+
+        // 📦 fetch requests
         const data = await getMyRequests(token);
         setRequests(data || []);
- 
+
+        // 👤 fetch profile
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/users/profile`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
- 
+
+        // 🚨 token expired / invalid
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          router.replace("/login");
+          return;
+        }
+
         if (res.ok) {
           const userData = await res.json();
           if (userData?.name) {
@@ -52,34 +72,32 @@ export function DashboardContent() {
           }
         }
       } catch (err) {
-        console.error(err);
+        console.error("Dashboard load failed:", err);
       } finally {
         setLoading(false);
       }
     }
- 
+
     load();
-  }, []);
- 
-  // Sort by most recent
+  }, [router]);
+
   const sortedRequests = useMemo(() => {
     return [...requests].sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
     );
   }, [requests]);
- 
+
   const latestRequest = sortedRequests[0] ?? null;
- 
-  // When a card is clicked, set it as the "latest" and open the modal
+
   function handleRequestClick(request: Request) {
     setSelectedRequest(request);
   }
- 
+
   return (
     <>
       <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
-        {/* HEADER */}
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold tracking-tight">
@@ -91,23 +109,21 @@ export function DashboardContent() {
           </div>
           <NewRequestButton />
         </div>
- 
-        {/* GRID */}
+
         <div className="grid gap-6 lg:grid-cols-2">
           <RecentRequestsList
             requests={sortedRequests}
             loading={loading}
             onRequestClick={handleRequestClick}
           />
- 
+
           <LatestRequestCard
             request={selectedRequest ?? latestRequest}
             loading={loading}
           />
         </div>
       </div>
- 
-      {/* MODAL OVERLAY */}
+
       <RequestDetailModal
         request={selectedRequest}
         onClose={() => setSelectedRequest(null)}
@@ -115,4 +131,3 @@ export function DashboardContent() {
     </>
   );
 }
- 

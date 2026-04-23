@@ -5,71 +5,77 @@ import { AuthCard } from "@/components/auth-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { ErrorBanner } from "@/components/ui/error-banner"
 
 export default function LoginPage() {
   const router = useRouter()
+  const [error, setError] = useState("")
+
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token")
+      if (!token) return
 
-      if (!token) return;
-      
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/validate`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/validate`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
 
         if (res.ok) {
-          // Token is valid → skip login
-          router.push("/dashboard");
+          router.push("/dashboard")
         } else {
-          // Invalid token → remove it
-          localStorage.removeItem("token");
+          localStorage.removeItem("token")
         }
       } catch (err) {
-        console.error("Auth check failed:", err);
+        console.error("Auth check failed:", err)
       }
-    };
-
-    checkAuth();
-  }, [router]);
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault()
-
-  const formData = new FormData(e.currentTarget)
-
-  const email = formData.get("email")
-  const password = formData.get("password")
-
-  try {
-    const res = await  fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ email, password }),
-});
-
-    const data = await res.json()
-    console.log("RESPONSE:", res.status)
-    console.log("DATA:", data)
-
-    if (!res.ok) {
-      alert(data.message || "Login failed")
-      return
     }
-    localStorage.setItem("token", data.access_token)
 
-    router.push("/dashboard")
-  } catch (err) {
-    console.error(err)
-    alert("Something went wrong")
+    checkAuth()
+  }, [router])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setError("")
+
+    const formData = new FormData(e.currentTarget)
+
+    const email = formData.get("email")
+    const password = formData.get("password")
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      )
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.message || "Login failed")
+        return
+      }
+
+      localStorage.setItem("token", data.access_token)
+      router.push("/dashboard")
+    } catch (err) {
+      setError("Network error. Please try again later.")
+      console.error(err)
+    }
   }
-}
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4">
@@ -80,6 +86,10 @@ export default function LoginPage() {
         footerLinkText="Sign up"
         footerLinkHref="/signup"
       >
+        {error && (
+          <ErrorBanner message={error} onClose={() => setError("")} />
+        )}
+
         <form onSubmit={handleSubmit}>
           <FieldGroup>
             <Field>
@@ -92,16 +102,18 @@ export default function LoginPage() {
                 required
               />
             </Field>
+
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
-                name='password'
+                name="password"
                 id="password"
                 type="password"
                 placeholder="Enter your password"
                 required
               />
             </Field>
+
             <Button type="submit" className="w-full">
               Login
             </Button>

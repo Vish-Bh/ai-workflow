@@ -32,7 +32,11 @@ export function UserNav() {
             Authorization: `Bearer ${token}`,
           },
         })
-
+ if (res.status === 401) {
+          localStorage.removeItem("token")
+          router.replace("/login")
+          return
+        }
         if (!res.ok) {
           throw new Error("Unauthorized")
         }

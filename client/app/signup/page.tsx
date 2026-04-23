@@ -5,43 +5,44 @@ import { AuthCard } from "@/components/auth-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { ErrorBanner } from "@/components/ui/error-banner"
 
 export default function SignUpPage() {
   const router = useRouter()
+  const [error, setError] = useState("")
 
-  // 🔁 same auth skip logic as login
- useEffect(() => {
-  const checkAuth = async () => {
-    const token = localStorage.getItem("token")
-    if (!token) return
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("token")
+      if (!token) return
 
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/validate`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/validate`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+
+        if (res.ok) {
+          router.push("/dashboard")
+        } else {
+          localStorage.removeItem("token")
         }
-      )
-
-      if (res.ok) {
-        router.push("/dashboard")
-      } else {
-        localStorage.removeItem("token")
+      } catch (err) {
+        console.error(err)
       }
-    } catch (err) {
-      console.error(err)
     }
-  }
 
-  checkAuth()
-}, [router])
+    checkAuth()
+  }, [router])
 
-  // ✅ actual signup logic
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setError("")
 
     const formData = new FormData(e.currentTarget)
 
@@ -50,30 +51,29 @@ export default function SignUpPage() {
     const password = formData.get("password")
 
     try {
-      const res = await  fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
-        method: "POST",
-        headers: {
-    "Content-Type": "application/json",
-  },
-        body: JSON.stringify({ name, email, password }),
-      })
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/signup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password }),
+        }
+      )
 
       const data = await res.json()
 
-      console.log("RESPONSE:", res.status)
-      console.log("DATA:", data)
-
       if (!res.ok) {
-        alert(data.message || "Signup failed")
+        setError(data.message || "Signup failed")
         return
       }
 
       localStorage.setItem("token", data.access_token)
-
       router.push("/dashboard")
     } catch (err) {
       console.error(err)
-      alert("Something went wrong")
+      setError("Network error. Please try again later.")
     }
   }
 
@@ -86,6 +86,10 @@ export default function SignUpPage() {
         footerLinkText="Login"
         footerLinkHref="/login"
       >
+        {error && (
+          <ErrorBanner message={error} onClose={() => setError("")} />
+        )}
+
         <form onSubmit={handleSubmit}>
           <FieldGroup>
             <Field>
@@ -98,6 +102,7 @@ export default function SignUpPage() {
                 required
               />
             </Field>
+
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
@@ -108,6 +113,7 @@ export default function SignUpPage() {
                 required
               />
             </Field>
+
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
@@ -118,6 +124,7 @@ export default function SignUpPage() {
                 required
               />
             </Field>
+
             <Button type="submit" className="w-full">
               Sign Up
             </Button>
