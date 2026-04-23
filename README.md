@@ -388,8 +388,9 @@ cd client && npm run build && npm run start
 
 ```env
 # App
-PORT=3000
-
+PORT=3001
+#Frontend
+FRONTEND_LINK=http://localhost:3000
 # MongoDB
 MONGODB_URI=mongodb://localhost:27017/ai-workflow
 # MongoDB Atlas: mongodb+srv://<user>:<password>@cluster.mongodb.net/ai-workflow
@@ -407,7 +408,7 @@ OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 ### `client/.env.local`
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 > ⚠️ Never commit `.env` or `.env.local` to version control. Both files are in `.gitignore`. Use the `.env.example` files as templates when setting up locally.
