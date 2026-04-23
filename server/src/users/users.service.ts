@@ -13,21 +13,19 @@ export class UsersService {
   ) {}
 
   // ---------------- SIGNUP ----------------
-  async createUser(dto: CreateUserDto) {
-    const existing = await this.userModel.findOne({ email: dto.email });
-    if (existing) throw new ConflictException('User already exists');
+ async createUser(dto: CreateUserDto) {
+  console.log("DTO:", dto);
+  const existing = await this.userModel.findOne({ email: dto.email });
+  if (existing) throw new ConflictException('User already exists');
 
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const user = await this.userModel.create({
-      email: dto.email,
-      password: hashedPassword,
-    });
+  const user = await this.userModel.create({
+    name: dto.name,
+    email: dto.email,
+    password: dto.password, // ✅ already hashed
+  });
 
-    return {
-      id: user._id,
-      email: user.email,
-    };
-  }
+  return user;
+}
 
   // ---------------- FIND USER BY EMAIL ----------------
   async findByEmail(email: string) {
@@ -43,6 +41,10 @@ export class UsersService {
     const isMatch = await bcrypt.compare(dto.password, user.password);
 
     if (!isMatch) throw new UnauthorizedException('Invalid credentials');
-    return User;
+    return user;
   }
+
+  async getUserById(userId: string) {
+  return this.userModel.findById(userId).select('-password');
+}
 }

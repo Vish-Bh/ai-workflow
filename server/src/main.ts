@@ -8,6 +8,11 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
+   app.enableCors({
+    origin: process.env.FRONTEND_LINK, // 👈 your Next.js frontend
+    credentials: true,
+  });
+
   await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

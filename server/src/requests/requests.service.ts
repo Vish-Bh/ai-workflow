@@ -17,12 +17,13 @@ export class RequestsService {
     private aiService: AiService,
   ) {}
 
-  async create(userId: string, dto: CreateRequestDto) {
+async createRequest(userId: string, dto: CreateRequestDto) {
   const request = await this.requestModel.create({
     userId,
-    category: dto.category,
-    summary: dto.summary,
-    urgency: dto.urgency,
+    message: dto.message, // ✅ MUST include message
+    category: dto.category || 'general', // default
+    urgency: dto.urgency || 'low',       // default
+    summary: '',          // temp (AI will update)
   });
 
   setImmediate(async () => {
@@ -53,4 +54,15 @@ export class RequestsService {
       .limit(limit)
       .sort({ createdAt: -1 });
   }
+
+  async getMyRequests(userId: string, page = 1, limit = 10) {
+  page = Math.max(1, page);
+  limit = Math.min(Math.max(1, limit), 50);
+
+  return this.requestModel
+    .find({ userId })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+}
 }

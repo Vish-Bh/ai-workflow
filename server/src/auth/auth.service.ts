@@ -10,11 +10,17 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup(email: string, password: string) {
-    const user = await this.usersService.createUser({ email, password });
+  async signup(name: string, email: string, password: string) {
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-    return this.generateToken(user);
-  }
+  const user = await this.usersService.createUser({
+    name,
+    email,
+    password: hashedPassword,
+  });
+
+  return this.generateToken(user); // reuse same logic
+}
 
   async login(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
@@ -31,9 +37,8 @@ export class AuthService {
   const token = this.jwtService.sign({
     sub: user._id.toString(),
     email: user.email,
+    name: user.name, // ✅ ADD THIS
   });
-
-  console.log('Token:', token);
 
   return {
     access_token: token,

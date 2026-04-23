@@ -8,10 +8,11 @@ import { Request } from '../requests/schemas/request.schema';
 export class AiService {
   constructor(
     @InjectModel(Request.name) private requestModel: Model<Request>,
-  ) { }
+  ) {}
 
   async enrichRequest(id: string) {
     console.log('AI started for:', id);
+
     const request = await this.requestModel.findById(id);
     if (!request) return;
 
@@ -20,11 +21,10 @@ export class AiService {
         'https://openrouter.ai/api/v1/chat/completions',
         {
           model: 'mistralai/mistral-7b-instruct-v0.1',
-           messages: [
+          messages: [
             {
               role: 'system',
-              content:
- `You are a support request triage assistant.
+              content: `You are a support request triage assistant.
 
 Return ONLY valid JSON:
 {
@@ -35,10 +35,8 @@ Return ONLY valid JSON:
             },
             {
               role: 'user',
-              content: `UserId: ${request.userId}
-Category: ${request.category}
-Summary: ${request.summary}
-Urgency: ${request.urgency}`
+              content: `User message:
+"${request.message}"`
             }
           ]
         },
@@ -51,26 +49,30 @@ Urgency: ${request.urgency}`
 
       const text = response.data.choices[0].message.content;
 
-      let parsed;
+      let parsed: any = {};
 
       try {
-        parsed = JSON.parse(text);
+        const match = text.match(/\{[\s\S]*\}/);
+        parsed = match ? JSON.parse(match[0]) : {};
       } catch {
-        parsed = {
-          category: 'general',
-          summary: 'Could not parse AI response',
-          urgency: 'low',
-        };
+        parsed = {};
       }
-      console.log(response.data);
 
+      // ✅ Safe fallback merge
+      const updateData = {
+        category: parsed.category || request.category || 'general',
+        urgency: parsed.urgency || request.urgency || 'low',
+        summary: parsed.summary || request.summary || 'No summary generated',
+      };
 
-      await this.requestModel.findByIdAndUpdate(id, parsed);
+      await this.requestModel.findByIdAndUpdate(id, {
+        $set: updateData,
+      });
+
+      console.log('AI updated:', updateData);
 
     } catch (err) {
-      console.error('AI ERROR FULL:', err);
-      console.error('AI ERROR MSG:', err.message);
-      console.error('AI ERROR DATA:', err.response?.data);
+      console.error('AI ERROR:', err.response?.data || err.message);
     }
   }
 }
