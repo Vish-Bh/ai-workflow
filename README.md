@@ -323,8 +323,8 @@ Returns the authenticated user's profile.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/ai-workflow-engine.git
-cd ai-workflow-engine
+git clone https://github.com/your-username/ai-workflow.git
+cd ai-workflow
 ```
 
 ### 2. Set up the backend
