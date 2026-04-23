@@ -6,8 +6,8 @@ function getToken() {
   return localStorage.getItem("token");
 }
 
-// 🚨 Central fetch wrapper (IMPORTANT)
-async function apiFetch(url, options = {}) {
+// 🚨 Central fetch wrapper
+async function apiFetch(url: string, options: RequestInit = {}) {
   const token = getToken();
 
   const res = await fetch(url, {
@@ -19,14 +19,12 @@ async function apiFetch(url, options = {}) {
     },
   });
 
-  // 🔐 Unauthorized handling
   if (res.status === 401) {
     localStorage.removeItem("token");
     window.location.href = "/login?reason=unauthorized";
     return null;
   }
 
-  // 🌐 network / server error
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.message || "Request failed");
@@ -35,12 +33,13 @@ async function apiFetch(url, options = {}) {
   return res.json();
 }
 
+// 📥 GET requests
 export async function getMyRequests(
-  userId,
-  page,
-  limit,
-  urgency,
-  category
+  userId: string,
+  page: number,
+  limit: number,
+  urgency?: string,
+  category?: string
 ) {
   const params = new URLSearchParams({
     userId,
@@ -57,4 +56,22 @@ export async function getMyRequests(
       method: "GET",
     }
   );
+}
+
+// 📤 CREATE request
+export async function createRequest(token: string, data: any) {
+  const res = await fetch(`${API_URL}/requests`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to create request");
+  }
+
+  return res.json();
 }
