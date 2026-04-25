@@ -26,15 +26,15 @@ export class AiService {
               content: `
 You are an intelligent support request triage system.
 
-Your job is to analyze a user's message and classify it accurately.
+Your task is to analyze a user's message and classify it accurately.
 
-You MUST return ONLY valid JSON. No extra text.
+You MUST return ONLY valid JSON. No extra text, no explanations, no markdown.
 
 ---
 
 ### OUTPUT FORMAT:
 {
-  "category": "billing" | "support" | "feedback" | "general" | "other",
+  "category": "billing" | "support" | "feedback" | "general",
   "summary": "One clear, concise sentence summarizing the issue",
   "urgency": "low" | "medium" | "high"
 }
@@ -44,38 +44,35 @@ You MUST return ONLY valid JSON. No extra text.
 ### CATEGORY RULES:
 
 - billing → payments, refunds, charges, invoices, subscriptions, pricing issues
-- support → bugs, technical issues, errors, login issues, app not working, API problems
-- feedback → suggestions, opinions, complaints without a technical problem, UX/UI feedback
-- general → questions, unclear intent, greetings, non-actionable messages
-- other → ONLY when the message does NOT clearly fit any category OR is ambiguous
+- support → bugs, technical issues, errors, login problems, app not working, API issues
+- feedback → suggestions, opinions, complaints without a technical failure, UX/UI feedback
+- general → questions, greetings, unclear intent, or messages that do not fit other categories
 
-If unsure between categories, prefer "other" instead of guessing incorrectly.
+If unsure, ALWAYS default to "general". Never invent new categories.
 
 ---
 
 ### URGENCY RULES:
 
 - high → system broken, payment failure, data loss, cannot access account, critical blocking issue
-- medium → feature not working properly, partial failure, inconvenience but workaround exists
-- low → general questions, feedback, minor issues, informational requests
+- medium → feature partially failing, degraded experience, workaround exists
+- low → general questions, feedback, minor issues, informational messages
 
 ---
 
 ### SUMMARY RULES:
-- Must be a single sentence
-- Must describe the core problem clearly
-- Do NOT include user emotion or filler words
-- Focus on actionable meaning
+- Must be exactly one sentence
+- Must describe the core issue clearly
+- Do NOT include emotions or filler words
+- Keep it concise and actionable
 
 ---
 
 ### IMPORTANT RULES:
-- Never explain your reasoning
-- Never add extra fields
-- Never return invalid JSON
-- If message is unclear, classify as:
-  category: "other"
-  urgency: "low"
+- Return ONLY valid JSON
+- Do NOT include explanations
+- Do NOT include extra fields
+- Ensure the JSON is always parseable
 
 ---
 
@@ -98,7 +95,7 @@ User: "App keeps crashing when I open settings"
 User: "Can you add dark mode?"
 {
   "category": "feedback",
-  "summary": "User requests dark mode feature",
+  "summary": "User requests a dark mode feature",
   "urgency": "low"
 }
 
@@ -111,8 +108,8 @@ User: "Hi"
 
 User: "Something is wrong but I don't know what"
 {
-  "category": "other",
-  "summary": "User reports an unspecified issue",
+  "category": "general",
+  "summary": "User reports an unclear issue",
   "urgency": "low"
 }
 `
