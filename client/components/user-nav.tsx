@@ -95,7 +95,7 @@ export function UserNav() {
           <User className="mr-2 h-4 w-4" />
           Profile
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/dashboard/request")}>
+        <DropdownMenuItem onClick={() => router.push("/dashboard/requests")}>
           <Ticket className="mr-2 h-4 w-4" />
           Tickets
         </DropdownMenuItem>
